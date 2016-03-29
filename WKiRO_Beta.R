@@ -1,40 +1,43 @@
 library(mlr)
 library(pROC)
+source("functions.R")
 
 DATA_DIR <- "data"
-IRIS_DATA_FILE_NAME <- "iris.data"
-IRIS_CLASS_COLLUMN_NAME <- "Species"
-CLASSIF <- "classif.lda"
+IRIS_DATA_FILE_NAME <- "glass.dataWithNames"
+IRIS_CLASS_COLLUMN_NAME <- "class"
+CLASSIF_LDA <- "classif.lda"
+CLASSIF_SVM <- "classif.svm"
+CLASSIF_naiveBayes <- "classif.naiveBayes"
+CLASSIF_knn <- "classif.knn"
 PREDICT_TYPE <- "prob"
 
+data <- getData(IRIS_DATA_FILE_NAME)
 
-importData <- read.csv(paste0(DATA_DIR,"/",IRIS_DATA_FILE_NAME),header = TRUE)
-rowNumber = nrow(importData)
-
-train.set = sort(sample(rowNumber, size = round(2/3 * rowNumber)))
-test.set = sort(setdiff(seq_len(rowNumber), train.set))
-
-trainData = importData[train.set,]
-testData = importData[test.set,]
-
-rownames(trainData) <- seq(length=nrow(trainData))
-rownames(testData) <- seq(length=nrow(testData))
-
-task = makeClassifTask(data = trainData, target = IRIS_CLASS_COLLUMN_NAME)
-lrn = makeLearner(CLASSIF, predict.type = PREDICT_TYPE)
+task = makeClassifTask(data = data$trainData, target = "class")
 
 
+lrnSvn = makeLearner(CLASSIF_SVM, predict.type = PREDICT_TYPE, kernel = "sigmoid")
+lrnLda = makeLearner(CLASSIF_LDA, predict.type = PREDICT_TYPE )
+lrnKnn = makeLearner(CLASSIF_knn)
+lrnNaiveBayes = makeLearner(CLASSIF_LDA, predict.type = PREDICT_TYPE)
 
-model = train(lrn, task)
 
-predictions = predict(model, newdata = testData)
+modelSvn = train(lrnSvn, task)
+modelLda = train(lrnLda, task)
+modelNaiveBayes = train(lrnNaiveBayes, task)
+modelKnn = train(lrnKnn, task)
 
-#multiclassResult = multiclass.roc(testData$Species, predictions)
-
-#predicted.class <- apply(mnm.predict.test.probs, 1, which.max)
-
-wynik = multiclass.roc(testData$Species,as.numeric(predictions$data$response))
-
-#multiclass.roc(ProxFiltered$response_variable, apply(preds2, 1, function(row) which.max(row)))
+wynik = getMAndCi(trainAndPredict(lrnSvn,task,data$testData),data$testData$class)
+print(wynik$M)
+print(wynik$Ci)
+wynik = getMAndCi(trainAndPredict(lrnLda,task,data$testData),data$testData$class)
+print(wynik$M)
+print(wynik$Ci)
+wynik = getMAndCi(trainAndPredict(lrnNaiveBayes,task,data$testData),data$testData$class)
+print(wynik$M)
+print(wynik$Ci)
+wynik = wynik = getMAndCi(trainAndPredict(lrnKnn,task,data$testData),data$testData$class)
+print(wynik$M)
+print(wynik$Ci)
 
 
