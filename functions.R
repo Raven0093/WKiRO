@@ -1,3 +1,4 @@
+#Pobieranie danych oraz dzielenie na dane testowe oraz treningowe
 getData <- function(FileName){
   
   importData <- read.csv(paste0(DATA_DIR,"/",FileName),header = TRUE)
@@ -15,6 +16,7 @@ getData <- function(FileName){
   return(list("trainData" = trainData,"testData" = testData))
 }
 
+#Generowanie obiektów z funkcji multiclass.roc oraz ci.auc
 getMAndCi <- function(predictions,target){
   predictionsResponse <- as.numeric(getPredictionResponse(predictions))
   multiclassResult = multiclass.roc(target, predictionsResponse)
@@ -23,57 +25,42 @@ getMAndCi <- function(predictions,target){
   return(list("M" = aucResult, "Ci" = ci))
 }
 
+#trenowanie oraz przewidywanie
 trainAndPredict <-function(lrn, task, data){
   model= train(lrn, task)
   predictions = predict(model, newdata = data)
   return(predictions)
 }
+#generowanie wyników dla klasyfikatora KNN
 knnClassif <- function(task,testData){
-  print("KNN****************************")
+  print("KNN")
   lrnKnn = makeLearner(CLASSIF_knn, k = 9)
-  wynik = wynik = getMAndCi(trainAndPredict(lrnKnn,task,testData),testData$class)
-  print(wynik$M)
-  print(wynik$Ci)
-  print("--------------")
+  result = getMAndCi(trainAndPredict(lrnKnn,task,testData),testData$class)
+  print(result$M)
+  print(result$Ci)
 }
+#generowanie wyników dla klasyfikatora LDA
 ldaClassif <- function(task,testData){
-  print("LDA****************************")
+  print("LDA")
   lrnLda = makeLearner(CLASSIF_LDA, predict.type = PREDICT_TYPE)
-  wynik = wynik = getMAndCi(trainAndPredict(lrnLda,task,testData),testData$class)
-  print(wynik$M)
-  print(wynik$Ci)
-  print("--------------")
+  result = getMAndCi(trainAndPredict(lrnLda,task,testData),testData$class)
+  print(result$M)
+  print(result$Ci)
 }
-
+#generowanie wyników dla klasyfikatora SVM
 svmClassif <- function(task,testData){
-  print("SVM****************************")
+  print("SVM")
   lrnSvn = makeLearner(CLASSIF_SVM, predict.type = PREDICT_TYPE, kernel = "sigmoid")
-  wynik = wynik = getMAndCi(trainAndPredict(lrnSvn,task,testData),testData$class)
-  print(wynik$M)
-  print(wynik$Ci)
-  print("--------------")
+  result = getMAndCi(trainAndPredict(lrnSvn,task,testData),testData$class)
+  print(result$M)
+  print(result$Ci)
 }
+#generowanie wyników dla klasyfikatora naiveBayes
 naiveBayesClassif <- function(task,testData){
-  print("NaiveBayes****************************")
+  print("NaiveBayes")
   lrnNaiveBayes = makeLearner(CLASSIF_naiveBayes)
-  wynik = wynik = getMAndCi(trainAndPredict(lrnNaiveBayes,task,testData),testData$class)
-  print(wynik$M)
-  print(wynik$Ci)
-  print("--------------")
+  result = getMAndCi(trainAndPredict(lrnNaiveBayes,task,testData),testData$class)
+  print(result$M)
+  print(result$Ci)
 }
 
-
-# knnClassif <- function(task,testData){
-#   print("KNN****************************")
-#   for (i in 1:50){
-#     if((i %% 6) == 0){
-#       lrnKnn = makeLearner(CLASSIF_knn, k = i)
-#       wynik = wynik = getMAndCi(trainAndPredict(lrnKnn,task,testData),testData$class)
-#       print (c("knn k = ",i))
-#       print(wynik$M)
-#       print(wynik$Ci)
-#       print("--------------")
-#     }
-#     
-#   }
-# }
