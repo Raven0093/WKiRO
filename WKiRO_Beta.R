@@ -1,9 +1,16 @@
 library(mlr)
 library(pROC)
 source("functions.R")
-for(i in 0:9){
+
 DATA_DIR <- "data"
-IRIS_DATA_FILE_NAME <- "optdigits.dataWithNames"
+
+CAR_DATA_FILE_NAME <- "car.dataWithNames"
+CAR_NUMERICAL_DATA_FILE_NAME <- "car.numericalDataWithNames"
+GLASS_DATA_FILE_NAME <- "glass.dataWithNames"
+IRIS_DATA_FILE_NAME <- "iris.dataWithNames"
+OPTDIGITS_DATA_FILE_NAME <- "optdigits.dataWithNames"
+VOWEL_DATA_FILE_NAME <- "vowel.dataWithName"
+
 IRIS_CLASS_COLLUMN_NAME <- "class"
 CLASSIF_LDA <- "classif.lda"
 CLASSIF_SVM <- "classif.svm"
@@ -20,6 +27,5 @@ knnClassif(task,data$testData)
 ldaClassif(task,data$testData)
 svmClassif(task,data$testData)
 naiveBayesClassif(task,data$testData)
-}
 
 
